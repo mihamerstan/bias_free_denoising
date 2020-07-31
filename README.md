@@ -59,10 +59,10 @@ Following [DnCNN](https://arxiv.org/abs/1608.03981) we extract patches from BSD4
 
 ```shell
 python preprocess_BSD400.py \
-		--data_path data/ \
-		--patch_size 50 \
+		--data-path data/ \
+		--patch-size 50 \
 		--stride 10 \
-		--aug_times 2
+		--aug-times 2
 ```
 
 ### BFBatchNorm2d
