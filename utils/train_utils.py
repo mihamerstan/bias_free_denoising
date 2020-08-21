@@ -9,7 +9,7 @@ import torch
 from datetime import datetime
 from torch.serialization import default_restore_location
 
-
+# TODO Update this for new parameters
 def add_logging_arguments(parser):
 	parser.add_argument("--seed", default=0, type=int, help="random number generator seed")
 	parser.add_argument("--output-dir", default="experiments", help="path to experiment directories")
@@ -39,12 +39,16 @@ def setup_experiment(args):
 		args.no_save = args.no_log = args.no_visual = True
 		return
 
-	args.experiment = args.experiment or f"{args.model.replace('_', '-')}"
-	args.experiment = "-".join([args.experiment, 'BF' if (not args.bias) else 'B', str(args.min_noise), str(args.max_noise)])
+	args.experiment = args.experiment or f"{args.model.replace('_', '-')}" or f"{args.modelG.replace('_', '-')}"
+	# args.experiment = "-".join([args.experiment, 'BF' if (not args.bias) else 'B', str(args.min_noise), str(args.max_noise)])
 	if not args.resume_training:
 		args.experiment = "-".join([args.experiment, datetime.now().strftime("%b-%d-%H:%M:%S")])
 
-	args.experiment_dir = os.path.join(args.output_dir, args.model, (f"drafts/" if args.draft else "") + args.experiment)
+	if hasattr(args,"modelG"):
+		args.experiment_dir = os.path.join(args.output_dir, args.modelG, (f"drafts/" if args.draft else "") + args.experiment)
+	elif hasattr(args,"model"):
+		args.experiment_dir = os.path.join(args.output_dir, args.model, (f"drafts/" if args.draft else "") + args.experiment)
+
 	os.makedirs(args.experiment_dir, exist_ok=True)
 
 	if not args.no_save:

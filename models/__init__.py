@@ -9,6 +9,9 @@ MODEL_REGISTRY = {}
 def build_model(args):
     return MODEL_REGISTRY[args.model].build_model(args)
 
+def build_model_gan(args):
+    return MODEL_REGISTRY[args.modelG].build_model(args), MODEL_REGISTRY[args.modelD].build_model(args)
+
 
 def register_model(name):
     """Decorator to register a new model"""

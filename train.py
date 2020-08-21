@@ -148,6 +148,7 @@ def get_args():
 	args, _ = parser.parse_known_args()
 	models.MODEL_REGISTRY[args.model].add_args(parser)
 	args = parser.parse_args()
+	print("vars(args)",vars())
 	return args
 
 

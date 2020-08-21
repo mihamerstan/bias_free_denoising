@@ -22,6 +22,7 @@ def main(args):
             for k in range(len(scales)):
                 Img = cv2.resize(img, (int(h * scales[k]), int(w * scales[k])), interpolation=cv2.INTER_CUBIC)
                 Img = np.expand_dims(Img[:, :, 0].copy(), 0) / 255.0
+                # I'm not sure what the patches do
                 patches = Im2Patch(Img, win=args.patch_size, stride=args.stride)
                 for n in range(patches.shape[3]):
                     data = patches[:, :, :, n].copy()
@@ -96,9 +97,9 @@ def data_augmentation(image, mode):
 def get_args():
     parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument("--data-path", default=".", help="path to data directory")
-    parser.add_argument("--patch-size", default=50, help="patch size")
-    parser.add_argument("--stride", default=10, help="stride")
-    parser.add_argument("--aug-times", default=2, help="number of augmentations")
+    parser.add_argument("--patch-size", default=50, help="patch size",  type=int)
+    parser.add_argument("--stride", default=10, help="stride", type=int)
+    parser.add_argument("--aug-times", default=2, help="number of augmentations", type=int)
     args = parser.parse_args()
     return args
 

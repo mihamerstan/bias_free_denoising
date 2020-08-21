@@ -37,7 +37,7 @@ class UNet(nn.Module):
 		pad_bottom = x.shape[-1]%2
 		padding = nn.ZeroPad2d((0, pad_bottom,  0, pad_right))
 		x = padding(x)
-
+		
 		out = F.relu(self.conv1(x))
 
 		out_saved = F.relu(self.conv2(out))
