@@ -35,8 +35,8 @@ class Discriminator(nn.Module):
     def add_args(parser):
         """Add model-specific arguments to the parser."""
         # TODO Add return_mask and multi_channel
-        parser.add_argument("--in-channels", type=int, default=1, help="number of image-channels")
-        parser.add_argument("--hidden-size", type=int, default=64, help="hidden dimension")
+        parser.add_argument("--in_channels", type=int, default=1, help="number of image-channels")
+        parser.add_argument("--hidden_size", type=int, default=64, help="hidden dimension")
 
         # parser.add_argument("--batchnorm", action='store_true', help="use batchnorm layers")
         # parser.add_argument("--bias", action='store_true', help="use residual bias")
