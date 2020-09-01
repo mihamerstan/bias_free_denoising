@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import glob
 import os
-import cv2
+# import cv2
 from utils import get_noise, ssim, psnr
 
 metrics_key = ['psnr', 'psnr_delta', 'ssim', 'ssim_delta'];
