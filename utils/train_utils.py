@@ -72,34 +72,39 @@ def init_logging(args):
 	logging.info("Arguments: {}".format(vars(args)))
 
 
-def save_checkpoint(args, step, model, optimizer=None, scheduler=None, score=None, mode="min"):
+def save_checkpoint_GAN(args, step, modelG, modelD, optimizerG=None, optimizerD=None, scheduler=None, score=None, mode="min"):
 	assert mode == "min" or mode == "max"
-	last_step = getattr(save_checkpoint, "last_step", -1)
-	save_checkpoint.last_step = max(last_step, step)
+	last_step = getattr(save_checkpoint_GAN, "last_step", -1)
+	save_checkpoint_GAN.last_step = max(last_step, step)
 
 	default_score = float("inf") if mode == "min" else float("-inf")
-	best_score = getattr(save_checkpoint, "best_score", default_score)
+	best_score = getattr(save_checkpoint_GAN, "best_score", default_score)
 	if (score < best_score and mode == "min") or (score > best_score and mode == "max"):
-		save_checkpoint.best_step = step
-		save_checkpoint.best_score = score
+		save_checkpoint_GAN.best_step = step
+		save_checkpoint_GAN.best_score = score
 
 	if not args.no_save and step % args.save_interval == 0:
 		os.makedirs(args.checkpoint_dir, exist_ok=True)
-		model = [model] if model is not None and not isinstance(model, list) else model
-		optimizer = [optimizer] if optimizer is not None and not isinstance(optimizer, list) else optimizer
+		modelG = [modelG] if modelG is not None and not isinstance(modelG, list) else modelG
+		modelD = [modelD] if modelD is not None and not isinstance(modelD, list) else modelD
+		optimizerG = [optimizerG] if optimizerG is not None and not isinstance(optimizerG, list) else optimizerG
+		optimizerD = [optimizerD] if optimizerD is not None and not isinstance(optimizerD, list) else optimizerD
 		scheduler = [scheduler] if scheduler is not None and not isinstance(scheduler, list) else scheduler
 		state_dict = {
 			"step": step,
 			"score": score,
-			"last_step": save_checkpoint.last_step,
-			"best_step": save_checkpoint.best_step,
-			"best_score": getattr(save_checkpoint, "best_score", None),
-			"model": [m.state_dict() for m in model] if model is not None else None,
-			"optimizer": [o.state_dict() for o in optimizer] if optimizer is not None else None,
+			"last_step": save_checkpoint_GAN.last_step,
+			"best_step": save_checkpoint_GAN.best_step,
+			"best_score": getattr(save_checkpoint_GAN, "best_score", None),
+			"modelG": [m.state_dict() for m in modelG] if modelG is not None else None,
+			"modelD": [m.state_dict() for m in modelD] if modelD is not None else None,
+			"optimizerG": [o.state_dict() for o in optimizerG] if optimizerG is not None else None,
+			"optimizerD": [o.state_dict() for o in optimizerD] if optimizerD is not None else None,
 			"scheduler": [s.state_dict() for s in scheduler] if scheduler is not None else None,
 			"args": argparse.Namespace(**{k: v for k, v in vars(args).items() if not callable(v)}),
 		}
-
+		print("best score: ",best_score)
+		print("step: ",step)
 		if args.step_checkpoints:
 			torch.save(state_dict, os.path.join(args.checkpoint_dir, "checkpoint{}.pt".format(step)))
 		if (score < best_score and mode == "min") or (score > best_score and mode == "max"):

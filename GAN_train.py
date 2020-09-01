@@ -242,7 +242,7 @@ def get_args():
 	parser.add_argument("--datasetG", default="masked_pwc", help="masked training data for generator")
 	parser.add_argument("--datasetD", default="pwc", help="unmasked training data for generator")
 	parser.add_argument("--batch-size", default=128, type=int, help="train batch size")
-	parser.add_argument("--n-data", default=1000,type=int, help="number of samples")
+	parser.add_argument("--n-data", default=10000,type=int, help="number of samples")
 	parser.add_argument("--min_sep", default=5,type=int, help="minimum constant sample count for piecwewise function")
 
 
@@ -255,7 +255,7 @@ def get_args():
 
 	# Add optimization arguments
 	parser.add_argument("--lr", default=.001, type=float, help="learning rate")
-	parser.add_argument("--num-epochs", default=5, type=int, help="force stop training at specified epoch")
+	parser.add_argument("--num-epochs", default=10, type=int, help="force stop training at specified epoch")
 	parser.add_argument("--valid-interval", default=1, type=int, help="evaluate every N epochs")
 	parser.add_argument("--save-interval", default=1, type=int, help="save a checkpoint every N steps")
 
