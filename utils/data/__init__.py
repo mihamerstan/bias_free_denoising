@@ -32,12 +32,12 @@ def register_dataset(name):
 #     return train_loader, valid_loader, None
 
 @register_dataset("pwc")
-def load_pwc(n_data=1000, batch_size=100, num_workers=0, fix_datapoints= False, min_sep = 5):
+def load_pwc(n_data=1000, batch_size=100, num_workers=4, fix_datapoints= False, min_sep = 5):
     train_dataset = utils.PieceWiseConstantDataset(n_data = n_data, fix_datapoints = fix_datapoints, min_sep= min_sep)
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, num_workers=4, shuffle=True)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, num_workers=num_workers, shuffle=True)
 
     valid_dataset = utils.PieceWiseConstantDataset(n_data = n_data, fix_datapoints=fix_datapoints, min_sep= min_sep)
-    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=1, num_workers=1, shuffle=False)
+    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=1, num_workers=1, shuffle=True)
     
     test_dataset = utils.PieceWiseConstantDataset(n_data = n_data, fix_datapoints=fix_datapoints, min_sep= min_sep)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=1, shuffle=True)

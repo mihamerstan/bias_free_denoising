@@ -85,8 +85,8 @@ def save_checkpoint_GAN(args, step, modelG, modelD, optimizerG=None, optimizerD=
 
 	if not args.no_save and step % args.save_interval == 0:
 		os.makedirs(args.checkpoint_dir, exist_ok=True)
-		modelG = [modelG] if modelG is not None and not isinstance(modelG, list) else modelG
-		modelD = [modelD] if modelD is not None and not isinstance(modelD, list) else modelD
+		modelG = modelG if modelG is not None and not isinstance(modelG, list) else modelG
+		modelD = modelD if modelD is not None and not isinstance(modelD, list) else modelD
 		optimizerG = [optimizerG] if optimizerG is not None and not isinstance(optimizerG, list) else optimizerG
 		optimizerD = [optimizerD] if optimizerD is not None and not isinstance(optimizerD, list) else optimizerD
 		scheduler = [scheduler] if scheduler is not None and not isinstance(scheduler, list) else scheduler
@@ -96,8 +96,8 @@ def save_checkpoint_GAN(args, step, modelG, modelD, optimizerG=None, optimizerD=
 			"last_step": save_checkpoint_GAN.last_step,
 			"best_step": save_checkpoint_GAN.best_step,
 			"best_score": getattr(save_checkpoint_GAN, "best_score", None),
-			"modelG": [m.state_dict() for m in modelG] if modelG is not None else None,
-			"modelD": [m.state_dict() for m in modelD] if modelD is not None else None,
+			"modelG": modelG.state_dict() if modelG is not None else None,
+			"modelD": modelD.state_dict() if modelD is not None else None,
 			"optimizerG": [o.state_dict() for o in optimizerG] if optimizerG is not None else None,
 			"optimizerD": [o.state_dict() for o in optimizerD] if optimizerD is not None else None,
 			"scheduler": [s.state_dict() for s in scheduler] if scheduler is not None else None,
@@ -154,10 +154,10 @@ def load_checkpoint_GAN(args, modelG=None, modelD=None, optimizerG=None, optimiz
 		scheduler = [scheduler] if scheduler is not None and not isinstance(scheduler, list) else scheduler
 
 		if "best_score" in state_dict:
-			save_checkpoint.best_score = state_dict["best_score"]
-			save_checkpoint.best_step = state_dict["best_step"]
+			save_checkpoint_GAN.best_score = state_dict["best_score"]
+			save_checkpoint_GAN.best_step = state_dict["best_step"]
 		if "last_step" in state_dict:
-			save_checkpoint.last_step = state_dict["last_step"]
+			save_checkpoint_GAN.last_step = state_dict["last_step"]
 		if modelG is not None and state_dict.get("modelG", None) is not None:
 			for m, state in zip(modelG, state_dict["modelG"]):
 				m.load_state_dict(state)

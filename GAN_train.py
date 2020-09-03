@@ -73,8 +73,9 @@ def main(args):
 
 
 	# TRAINING
-	fake_label = 0.
+	fake_label = 0.1
 	real_label = 1.
+	real_labelD = 0.9
 	# fake_label = [0.,0.1]
 	# real_label = [0.9,1.]
 
@@ -102,20 +103,21 @@ def main(args):
 	        ###############################
 	        # First train the discriminator
 	        ###############################
-	        netD.zero_grad()
+	        # Only update discriminator based on update ratio
 	        real_cpu = real.to(device)
 	        b_size = real_cpu.size(0)
-	        label = torch.full((b_size,),real_label,device=device)
-	        # Introducing label noise
-	#         label = torch.rand((b_size,),device=device)*(real_label[1]-real_label[0])+real_label[0]
+	        label = torch.full((b_size,),real_labelD,device=device)
 
-	        # Forward pass real batch through D
-	        output = netD(real_cpu).view(-1)
-	        # Calculate loss on all-real batch
-	        errD_real = criterion(output, label)
-	        # Calculate gradients for D in backward pass
-	        errD_real.backward()
-	        D_x = output.mean().item()
+	        if batch_id % args.g_d_update_ratio == 0:
+	            netD.zero_grad()
+
+	            # Forward pass real batch through D
+	            output = netD(real_cpu).view(-1)
+	            # Calculate loss on all-real batch
+	            errD_real = criterion(output, label)
+	            # Calculate gradients for D in backward pass
+	            errD_real.backward()
+	            D_x = output.mean().item()
 	        
 	        ## Train with all-fake batch
 	        # Generate fake signal batch with G
@@ -126,20 +128,18 @@ def main(args):
 	        fake = (1-mask_inputs)*raw_outputs + mask_inputs*inputs
 	        
 	        label.fill_(fake_label)
-	        # Introducing label noise
-	#         label = torch.rand((b_size,),device=device)*(fake_label[1]-fake_label[0])+fake_label[0]
-
-	        # Classify all fake batch with D
-	        output = netD(fake.detach()).view(-1)
-	        # Calculate D's loss on the all-fake batch
-	        errD_fake = criterion(output, label)
-	        # Calculate the gradients for this batch
-	        errD_fake.backward()
-	        D_G_z1 = output.mean().item()
-	        # Add the gradients from the all-real and all-fake batches
-	        errD = errD_real + errD_fake
-	        # Update D
-	        optimizerD.step()
+	        if batch_id % args.g_d_update_ratio == 0:
+	            # Classify all fake batch with D
+	            output = netD(fake.detach()).view(-1)
+	            # Calculate D's loss on the all-fake batch
+	            errD_fake = criterion(output, label)
+	            # Calculate the gradients for this batch
+	            errD_fake.backward()
+	            D_G_z1 = output.mean().item()
+	            # Add the gradients from the all-real and all-fake batches
+	            errD = errD_real + errD_fake
+	            # Update D
+	            optimizerD.step()
 	        
 	        ###############################
 	        # Next, train the generator
@@ -242,7 +242,7 @@ def get_args():
 	parser.add_argument("--datasetG", default="masked_pwc", help="masked training data for generator")
 	parser.add_argument("--datasetD", default="pwc", help="unmasked training data for generator")
 	parser.add_argument("--batch-size", default=128, type=int, help="train batch size")
-	parser.add_argument("--n-data", default=10000,type=int, help="number of samples")
+	parser.add_argument("--n-data", default=1000,type=int, help="number of samples")
 	parser.add_argument("--min_sep", default=5,type=int, help="minimum constant sample count for piecwewise function")
 
 
@@ -251,11 +251,11 @@ def get_args():
 	parser.add_argument("--modelG", default="unet1d", help="Generator model architecture")
 	parser.add_argument("--modelD", default="gan_discriminator", help="Discriminator model architecture")
 	parser.add_argument("--wtl2", default="0.", type=float, help="weighting to L2 loss, remainder is adversarial loss")
-
+	parser.add_argument("--g_d_update_ratio", default = 2, type=int, help="How many times to update G for each update of D")
 
 	# Add optimization arguments
 	parser.add_argument("--lr", default=.001, type=float, help="learning rate")
-	parser.add_argument("--num-epochs", default=10, type=int, help="force stop training at specified epoch")
+	parser.add_argument("--num-epochs", default=4, type=int, help="force stop training at specified epoch")
 	parser.add_argument("--valid-interval", default=1, type=int, help="evaluate every N epochs")
 	parser.add_argument("--save-interval", default=1, type=int, help="save a checkpoint every N steps")
 
