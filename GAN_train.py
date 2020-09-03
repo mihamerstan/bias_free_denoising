@@ -40,7 +40,7 @@ def main(args):
 
 	# 2 optimizers
 	optimizerG = torch.optim.Adam(netG.parameters(), lr=args.lr,betas=(0.5, 0.999))
-	optimizerD = torch.optim.Adam(netD.parameters(), lr=args.lr,betas=(0.5, 0.999))
+	optimizerD = torch.optim.Adam(netD.parameters(), lr=args.lr*3,betas=(0.5, 0.999))
 
 	logging.info(f"Built a generator model consisting of {sum(p.numel() for p in netG.parameters()):,} parameters")
 	logging.info(f"Built a discriminator model consisting of {sum(p.numel() for p in netD.parameters()):,} parameters")
@@ -76,8 +76,6 @@ def main(args):
 	fake_label = 0.1
 	real_label = 1.
 	real_labelD = 0.9
-	# fake_label = [0.,0.1]
-	# real_label = [0.9,1.]
 
 	G_losses = []
 	D_losses = []
@@ -241,8 +239,8 @@ def get_args():
 	parser.add_argument("--data-path", default="data", help="path to data directory")
 	parser.add_argument("--datasetG", default="masked_pwc", help="masked training data for generator")
 	parser.add_argument("--datasetD", default="pwc", help="unmasked training data for generator")
-	parser.add_argument("--batch-size", default=128, type=int, help="train batch size")
-	parser.add_argument("--n-data", default=1000,type=int, help="number of samples")
+	parser.add_argument("--batch-size", default=256, type=int, help="train batch size")
+	parser.add_argument("--n-data", default=100000,type=int, help="number of samples")
 	parser.add_argument("--min_sep", default=5,type=int, help="minimum constant sample count for piecwewise function")
 
 
@@ -254,9 +252,9 @@ def get_args():
 	parser.add_argument("--g_d_update_ratio", default = 2, type=int, help="How many times to update G for each update of D")
 
 	# Add optimization arguments
-	parser.add_argument("--lr", default=.001, type=float, help="learning rate")
-	parser.add_argument("--num-epochs", default=4, type=int, help="force stop training at specified epoch")
-	parser.add_argument("--valid-interval", default=1, type=int, help="evaluate every N epochs")
+	parser.add_argument("--lr", default=.0005, type=float, help="learning rate")
+	parser.add_argument("--num-epochs", default=300, type=int, help="force stop training at specified epoch")
+	parser.add_argument("--valid-interval", default=25, type=int, help="evaluate every N epochs")
 	parser.add_argument("--save-interval", default=1, type=int, help="save a checkpoint every N steps")
 
 	# Parse twice as model arguments are not known the first time
