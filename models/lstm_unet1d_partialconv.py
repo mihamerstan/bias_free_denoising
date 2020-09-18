@@ -9,13 +9,15 @@ from models import PartialConv1d
 import math
 
 ### 1D PartialConv U-NET
-@register_model("unet1d")
+@register_model("lstm_unet1d")
 class UNet(nn.Module):
 	"""UNet as defined in https://arxiv.org/abs/1805.07709"""
-	def __init__(self, bias, residual_connection = False):
+	def __init__(self, bias, in_channels=6, out_channels=3, residual_connection = False):
 		super(UNet, self).__init__()
+		self.in_channels = in_channels
+		self.out_channels = out_channels
 
-		self.conv1 = PartialConv1d.PartialConv1d(1,32,5,padding = 2, bias = bias, multi_channel=False)
+		self.conv1 = PartialConv1d.PartialConv1d(6,32,5,padding = 2, bias = bias, multi_channel=False)
 		self.conv2 = PartialConv1d.PartialConv1d(32,32,3,padding = 1, bias = bias, multi_channel=False)
 		self.conv3 = PartialConv1d.PartialConv1d(32,64,3,stride=2, padding = 1, bias = bias, multi_channel=False)
 		self.conv4 = PartialConv1d.PartialConv1d(64,64,3,padding = 1, bias=bias, multi_channel=False)
@@ -23,7 +25,7 @@ class UNet(nn.Module):
 		self.conv6 = PartialConv1d.PartialConv1d(64,64,3,dilation = 4,padding = 4, bias = bias, multi_channel=False)
 		self.conv7 = nn.ConvTranspose1d(64,64, 4,stride = 2, padding = 1, bias = bias)
 		self.conv8 = PartialConv1d.PartialConv1d(96,32,3,padding=1, bias = bias, multi_channel=False)
-		self.conv9 = PartialConv1d.PartialConv1d(32,1,5,padding = 2, bias = False, multi_channel=False)
+		self.conv9 = PartialConv1d.PartialConv1d(32,self.out_channels,5,padding = 2, bias = False, multi_channel=False)
 
 		self.residual_connection = residual_connection;
 		
